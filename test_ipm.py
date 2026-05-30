@@ -36,7 +36,8 @@ def run_cmd(argv: list[str]) -> None:
         {"add": ipm.cmd_room_add, "list": ipm.cmd_room_list}[args.room_command](args, data)
     elif args.command == "task":
         {"add": ipm.cmd_task_add, "list": ipm.cmd_task_list,
-         "status": ipm.cmd_task_status, "done": ipm.cmd_task_done}[args.task_command](args, data)
+         "status": ipm.cmd_task_status, "done": ipm.cmd_task_done,
+         "notes": ipm.cmd_task_notes}[args.task_command](args, data)
 
 
 class TestProjects(unittest.TestCase):
@@ -107,6 +108,16 @@ class TestTasks(unittest.TestCase):
             run_cmd(["task", "status", "--project", "1", "--task-id", "1", "--status", status])
             data = ipm.load()
             self.assertEqual(data["projects"][0]["tasks"][0]["status"], status)
+
+    def test_add_notes_to_task(self):
+        run_cmd(["task", "add", "--project", "1", "--name", "Ceiling work"])
+        run_cmd(["task", "notes", "--project", "1", "--task-id", "1",
+                 "--text", "Use moisture-resistant paint near windows."])
+        data = ipm.load()
+        self.assertEqual(
+            data["projects"][0]["tasks"][0]["notes"],
+            "Use moisture-resistant paint near windows.",
+        )
 
     def test_task_requires_existing_room(self):
         with self.assertRaises(SystemExit):

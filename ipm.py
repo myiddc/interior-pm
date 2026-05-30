@@ -157,6 +157,18 @@ def cmd_task_done(args, data):
     cmd_task_status(args, data)
 
 
+def cmd_task_notes(args, data):
+    project = find_project(data, args.project)
+    if not project:
+        sys.exit(f"Project #{args.project} not found.")
+    task = next((t for t in project["tasks"] if t["id"] == args.task_id), None)
+    if not task:
+        sys.exit(f"Task #{args.task_id} not found.")
+    task["notes"] = args.text
+    save(data)
+    print(f"Task #{task['id']} '{task['name']}': notes updated.")
+
+
 def cmd_report(args, data):
     project = find_project(data, args.project)
     if not project:
@@ -247,6 +259,11 @@ def build_parser() -> argparse.ArgumentParser:
     p_task_done.add_argument("--task-id", type=int, required=True)
     p_task_done.add_argument("--cost", type=int, help="Record actual cost")
 
+    p_task_notes = task_sub.add_parser("notes", help="Add or update notes on a task")
+    p_task_notes.add_argument("--project", type=int, required=True)
+    p_task_notes.add_argument("--task-id", type=int, required=True)
+    p_task_notes.add_argument("--text", required=True, help="Note text")
+
     # report
     p_report = sub.add_parser("report", help="Show project report")
     p_report.add_argument("--project", type=int, required=True)
@@ -270,7 +287,7 @@ def main():
     elif args.command == "room":
         {"add": cmd_room_add, "list": cmd_room_list}[args.room_command](args, data)
     elif args.command == "task":
-        {"add": cmd_task_add, "list": cmd_task_list,
+        {"add": cmd_task_add, "list": cmd_task_list, "notes": cmd_task_notes,
          "status": cmd_task_status, "done": cmd_task_done}[args.task_command](args, data)
 
 
