@@ -45,6 +45,13 @@ python ipm.py task add --project 1 --room "Living Room" \
 python ipm.py task done --project 1 --task-id 3
 ```
 
+### Add notes to a task
+
+```bash
+python ipm.py task notes --project 1 --task-id 2 \
+  --text "Use moisture-resistant paint near windows."
+```
+
 ### Show project report
 
 ```bash
